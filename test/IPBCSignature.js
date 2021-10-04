@@ -1,15 +1,14 @@
 const IPBCSignature = artifacts.require("./IPBCSignature.sol");
 
 contract("IPBCSignature", accounts => {
-  it("...should store the value 89.", async () => {
-    const ipbc = await IPBCSignature.deployed();
+  let contract;
 
-    // Set value of 89
-    await ipbc.set(89, { from: accounts[0] });
+  beforeEach(async () => {
+    contract = await IPBCSignature.deployed();
+  });
 
-    // Get stored value
-    const storedData = await ipbc.get.call();
-
-    assert.equal(storedData, 89, "The value 89 was not stored.");
+  it("should check the contract ha an address", async () => {
+    let addr = contract.address;
+    assert.notEqual(addr, "", "Contract address not found");
   });
 });
