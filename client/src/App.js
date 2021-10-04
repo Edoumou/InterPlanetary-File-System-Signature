@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import IPBCSignature from "./contracts/IPBCSignature.json";
-import getWeb3 from "./getWeb3";
+import web3Connection from "./web3Connection";
 
 import "./App.css";
 
@@ -10,7 +10,7 @@ class App extends Component {
   componentDidMount = async () => {
     try {
       // Get network provider and web3 instance.
-      const web3 = await getWeb3();
+      const web3 = await web3Connection();
 
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
