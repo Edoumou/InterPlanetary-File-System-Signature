@@ -1,33 +1,43 @@
 import React, { Component } from "react";
-import IPBCSignature from "./contracts/IPBCSignature.json";
 import web3Connection from "./web3Connection";
+import IPBCSignatureContract from "./IPBCSignatureContract";
 
 import "./App.css";
 
 class App extends Component {
-  state = { storageValue: 0, web3: null, accounts: null, contract: null };
+  state = {
+    storageValue: 0,
+    web3: null,
+    account: null,
+    IPBCcontract: null
+  };
 
   componentDidMount = async () => {
     try {
-      // Get network provider and web3 instance.
-      const web3 = await web3Connection();
+      //================= connect to web3 =================
+      let web3 = await web3Connection();
+      //===================================================
 
-      // Use web3 to get the user's accounts.
+      //=================== Get contracts =================
+      let IPBCcontract = await IPBCSignatureContract(web3);
+      //===================================================
+
+      //============== get the user account ===============
       const accounts = await web3.eth.getAccounts();
+      let account = accounts[0];
+      //===================================================
 
-      // Get the contract instance.
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = IPBCSignature.networks[networkId];
-      const instance = new web3.eth.Contract(
-        IPBCSignature.abi,
-        deployedNetwork && deployedNetwork.address,
+      //================= update states ===================
+      this.setState(
+        {
+          web3,
+          account,
+          IPBCcontract
+        },
+        this.runExample
       );
-
-      // Set web3, accounts, and contract to the state, and then proceed with an
-      // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance }, this.runExample);
+      //===================================================
     } catch (error) {
-      // Catch any errors for any of the above operations.
       alert(
         `Failed to load web3, accounts, or contract. Check console for details.`,
       );
@@ -36,13 +46,14 @@ class App extends Component {
   };
 
   runExample = async () => {
-    const { accounts, contract } = this.state;
+    const { account, IPBCcontract } = this.state;
+    console.log("Contract:", IPBCcontract);
 
     // Stores a given value, 5 by default.
-    await contract.methods.set(5).send({ from: accounts[0] });
+    await IPBCcontract.methods.set(5).send({ from: account });
 
     // Get the value from the contract to prove it worked.
-    const response = await contract.methods.get().call();
+    const response = await IPBCcontract.methods.get().call();
 
     // Update state with the result.
     this.setState({ storageValue: response });
